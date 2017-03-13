@@ -83,7 +83,7 @@ public class MePhysicalRequest {
             uriBuilder.appendQueryParameter("limit", String.valueOf(mLimit));
         }
 
-        uriBuilder.appendQueryParameter("type", "phyisical");
+        uriBuilder.appendQueryParameter("type", "physical");
 
         final JsonObjectRequest activitiesRequest = new ActivitiesRequest(appContext, uriBuilder.toString(), oaf);
         VolleySingleton.getInstance(appContext).addToRequestQueue(activitiesRequest);
