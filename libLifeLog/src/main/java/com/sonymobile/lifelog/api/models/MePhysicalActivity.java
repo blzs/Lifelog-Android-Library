@@ -18,7 +18,7 @@ public class MePhysicalActivity {
     String subtype = "";
     String startTime = "";
     String endTime = "";
-    String[] steps;
+    List<String>  steps = new ArrayList<>();
     List<String> distances = new ArrayList<>();
     List<String> aee = new ArrayList<>();
     List<String> tee = new ArrayList<>();
@@ -30,14 +30,34 @@ public class MePhysicalActivity {
         type = obj.getString("type");
         subtype = obj.getString("subtype");
 
-        JSONArray jarr = obj.getJSONArray("details");
-        for (int i = 0; i < jarr.length(); i++) {
-            try {
+        JSONObject detailsObj = obj.getJSONObject("details");
 
+        JSONArray stepsJSON = detailsObj.getJSONArray("steps");
+        JSONArray distanceJSON = detailsObj.getJSONArray("distance");
+        JSONArray aeeJSON = detailsObj.getJSONArray("aee");
+        JSONArray teeJSON = detailsObj.getJSONArray("tee");
 
-            } catch (Exception e ){
+        try {
 
+            for (int i = 0; i < stepsJSON.length(); i++) {
+                steps.add(stepsJSON.get(i).toString());
             }
+
+            for (int i = 0; i < distanceJSON.length(); i++) {
+                distances.add(distanceJSON.get(i).toString());
+            }
+
+            for (int i = 0; i < aeeJSON.length(); i++) {
+                aee.add(aeeJSON.get(i).toString());
+            }
+
+            for (int i = 0; i < teeJSON.length(); i++) {
+                tee.add(teeJSON.get(i).toString());
+            }
+
+
+
+        }catch (Exception e ){
 
         }
     }
