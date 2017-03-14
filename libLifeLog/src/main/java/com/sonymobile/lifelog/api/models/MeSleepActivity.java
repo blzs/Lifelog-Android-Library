@@ -46,6 +46,23 @@ public class MeSleepActivity {
 
     }
 
+    public String getId() {
+        return id;
+    }
 
+    public String getType() {
+        return type;
+    }
 
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public List<String> getStates() {
+        return states;
+    }
 }

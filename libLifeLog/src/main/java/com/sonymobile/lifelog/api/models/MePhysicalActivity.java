@@ -63,5 +63,39 @@ public class MePhysicalActivity {
     }
 
 
+    public String getId() {
+        return id;
+    }
 
+    public String getType() {
+        return type;
+    }
+
+    public String getSubtype() {
+        return subtype;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public List<String> getSteps() {
+        return steps;
+    }
+
+    public List<String> getDistances() {
+        return distances;
+    }
+
+    public List<String> getAee() {
+        return aee;
+    }
+
+    public List<String> getTee() {
+        return tee;
+    }
 }
