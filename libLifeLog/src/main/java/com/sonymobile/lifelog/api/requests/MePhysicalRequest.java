@@ -2,8 +2,11 @@ package com.sonymobile.lifelog.api.requests;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.MePhysicalActivity;
@@ -32,6 +35,9 @@ public class MePhysicalRequest {
     private static final String TAG = "LifeLog:PhysicalAPI";
     private String mStartTime, mEndTime;
     private Integer mLimit;
+
+    @Nullable
+    private String mNextPage;
 
 
     private static final Uri ACTIVITIES_BASE_URL =
@@ -62,14 +68,14 @@ public class MePhysicalRequest {
             @Override
             public void onAuthChecked(boolean authenticated) {
                 if(authenticated) {
-                    callMeAPI(appContext, opf);
+                    callPhysicalAPI(appContext, opf);
                 }
             }
         });
 
     }
 
-    private void callMeAPI(Context appContext, OnPhysicalFetched oaf) {
+    private void callPhysicalAPI(Context appContext, OnPhysicalFetched oaf) {
 
         Uri.Builder uriBuilder = ACTIVITIES_BASE_URL.buildUpon();
 
@@ -107,6 +113,21 @@ public class MePhysicalRequest {
                         }
 
 
+                        JSONArray links = jsonObject.optJSONArray("links");
+                        if (links != null) {
+                            for (int i = 0; i < links.length(); i++) {
+                                JSONObject object = links.getJSONObject(i);
+                                if (TextUtils.equals("next", object.optString("rel"))) {
+                                    String href = object.optString("href");
+                                    if (!TextUtils.isEmpty(href) && URLUtil
+                                            .isNetworkUrl(href)) {
+                                        mNextPage = href;
+                                    }
+                                }
+                            }
+                        }
+
+
 
                         opf.onPhysicalFetched(activities);
                     } catch (JSONException e) {
@@ -128,6 +149,19 @@ public class MePhysicalRequest {
 
 
         }
+    }
+
+
+    public boolean getNextPage(@NonNull final Context context, @NonNull final OnPhysicalFetched onPhysicalFetched) {
+        if (mNextPage == null) {
+            return false;
+        }
+        Context appContext = context.getApplicationContext();
+        final JsonObjectRequest physicalRequest = new ActivitiesRequest(appContext, mNextPage, onPhysicalFetched);
+        mNextPage = null;
+        VolleySingleton.getInstance(appContext).addToRequestQueue(physicalRequest);
+        return true;
+
     }
 
     public interface OnPhysicalFetched {

@@ -2,8 +2,11 @@ package com.sonymobile.lifelog.api.requests;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.MeSleepActivity;
@@ -34,6 +37,9 @@ public class MeSleepRequest {
     private String mStartTime, mEndTime;
     private Integer mLimit;
 
+    @Nullable
+    private String mNextPage;
+
 
     private static final Uri ACTIVITIES_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("users/me/activities").build();
@@ -63,14 +69,14 @@ public class MeSleepRequest {
             @Override
             public void onAuthChecked(boolean authenticated) {
                 if(authenticated) {
-                    callMeAPI(appContext, osf);
+                    callSleepAPI(appContext, osf);
                 }
             }
         });
 
     }
 
-    private void callMeAPI(Context appContext, OnSleepFetched osf) {
+    private void callSleepAPI(Context appContext, OnSleepFetched osf) {
 
         Uri.Builder uriBuilder = ACTIVITIES_BASE_URL.buildUpon();
 
@@ -107,6 +113,21 @@ public class MeSleepRequest {
                             activities.add(new MeSleepActivity(resultArray.getJSONObject(i)));
                         }
 
+                        JSONArray links = jsonObject.optJSONArray("links");
+                        if (links != null) {
+                            for (int i = 0; i < links.length(); i++) {
+                                JSONObject object = links.getJSONObject(i);
+                                if (TextUtils.equals("next", object.optString("rel"))) {
+                                    String href = object.optString("href");
+                                    if (!TextUtils.isEmpty(href) && URLUtil
+                                            .isNetworkUrl(href)) {
+                                        mNextPage = href;
+                                    }
+                                }
+                            }
+                        }
+
+
 
 
                         osf.onSleepFetched(activities);
@@ -128,6 +149,19 @@ public class MeSleepRequest {
                         }
                     });
     }
+    }
+
+
+    public boolean getNextPage(@NonNull final Context context, @NonNull final OnSleepFetched onSleepFetched) {
+        if (mNextPage == null) {
+            return false;
+        }
+        Context appContext = context.getApplicationContext();
+        final JsonObjectRequest sleepRequest = new ActivitiesRequest(appContext, mNextPage, onSleepFetched);
+        mNextPage = null;
+        VolleySingleton.getInstance(appContext).addToRequestQueue(sleepRequest);
+        return true;
+
     }
 
 
