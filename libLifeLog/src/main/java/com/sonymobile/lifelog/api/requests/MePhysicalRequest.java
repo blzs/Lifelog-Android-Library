@@ -157,6 +157,7 @@ public class MePhysicalRequest {
             return false;
         }
         Context appContext = context.getApplicationContext();
+        mNextPage += "&type=physical";
         final JsonObjectRequest physicalRequest = new ActivitiesRequest(appContext, mNextPage, onPhysicalFetched);
         mNextPage = null;
         VolleySingleton.getInstance(appContext).addToRequestQueue(physicalRequest);
