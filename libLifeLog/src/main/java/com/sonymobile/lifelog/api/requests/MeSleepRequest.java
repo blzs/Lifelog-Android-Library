@@ -157,7 +157,7 @@ public class MeSleepRequest {
             return false;
         }
         Context appContext = context.getApplicationContext();
-        mNextPage += "&type=sleep";g
+        mNextPage += "&type=sleep";
         final JsonObjectRequest sleepRequest = new ActivitiesRequest(appContext, mNextPage, onSleepFetched);
         mNextPage = null;
         VolleySingleton.getInstance(appContext).addToRequestQueue(sleepRequest);
